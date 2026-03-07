@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>শুভ জন্মদিন!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-pink: #ff758c;
+            --text-color: #d63384;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            font-family: 'Hind Siliguri', sans-serif;
+            text-align: center;
+            overflow-x: hidden;
+        }
+
+        .header-area { margin-top: 20px; z-index: 10; }
+        
+        .heart-icon { font-size: 50px; animation: beat 1.2s infinite; display: inline-block; }
+        @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+
+        .poem-container {
+            background: rgba(255, 255, 255, 0.96);
+            padding: 30px 20px;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            margin: 25px auto;
+            line-height: 2;
+            font-size: 1.2rem;
+            color: var(--text-color);
+            display: none;
+            border: 3px double var(--primary-pink);
+            max-width: 90%;
+            z-index: 20;
+            min-height: 200px;
+            text-align: left;
+        }
+
+        #poem-text::after {
+            content: "|";
+            animation: blink 0.7s infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .main-btn, .audio-btn {
+            background: #ff4b5c;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(255, 75, 92, 0.4);
+        }
+
+        .audio-btn {
+            background: #4facfe; 
+            box-shadow: 0 8px 20px rgba(79, 172, 254, 0.4);
+            display: none; 
+            width: 100%;
+            margin-top: 15px; /* Spacing above the button */
+        }
+
+        .kiss-btn {
+            background: #ff85a2;
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            display: none;
+            width: 100%;
+            font-family: 'Hind Siliguri';
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .balloon {
+            position: fixed;
+            bottom: -100px;
+            width: 45px;
+            height: 55px;
+            border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
+            z-index: 5;
+            animation: floatUp 6s ease-in forwards;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-130vh) rotate(10deg); opacity: 0; }
+        }
+
+        .kiss-emoji {
+            position: fixed;
+            font-size: 40px;
+            pointer-events: none;
+            z-index: 1000;
+            animation: flyKiss 2s ease-out forwards;
+        }
+        @keyframes flyKiss {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(2.5) translateY(-200px); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="voiceNote">
+        <source src="audio.mp4" type="audio/mp4">
+    </audio>
+
+    <div class="header-area">
+        <div class="heart-icon">❤️</div>
+        <h2 style="color: #fff; text-shadow: 1px 1px 4px rgba(0,0,0,0.2);">শুভ জন্মদিন প্রিয়তমা!</h2>
+    </div>
+    
+    <button id="startBtn" class="main-btn" onclick="startCelebration()">শুধু তোমারই জন্যে 💌</button>
+
+    <div id="poemBox" class="poem-container">
+        <div id="poem-text"></div>
+        
+        <button class="kiss-btn" id="kissBtn" onclick="sendKisses()">হামি নাও (Click Here) 😘</button>
+
+        <button id="audioBtn" class="audio-btn" onclick="playMyVoice()">তোমার জন্য, শোনো এটা একবার  🎤</button>
+    </div>
+
+    <script>
+        const fullPoem = `তুমি আমার যৌবনা,
+তুমি আমার কামনা,
+তুমি , তুমি , শুধুই তুমি 
+ বাদে আর কিছু চাইনা। 
+
+আজকের এই মিষ্টি দিনে
+পাশটায় থাকতে পারলাম না,
+আর রাত্রে ঠিক ১২ টায়
+উম্মাআআআঃ ও দিতে পারলাম না। 
+
+এক এক করে একুশ হলেও
+বড়ো আর তুমি হচ্ছ না,
+নাই বা হলে বেশিই বড়ো 
+ছোট্ট তুমিও মন্দ না। 
+
+মন প্রাণ সব তোমারে দিয়েছি
+বলছি একবার শোনোনা,
+তুমিই আমার যৌবনশ্রী 
+তুমি আমার মিষ্টি সোনা।`;
+
+        let charIndex = 0;
+        const speed = 100; 
+
+        function startCelebration() {
+            document.getElementById('poemBox').style.display = 'block';
+            document.getElementById('startBtn').style.display = 'none';
+            
+            typeWriter();
+            launchBalloons();
+        }
+
+        function playMyVoice() {
+            const audio = document.getElementById('voiceNote');
+            audio.play();
+        }
+
+        function typeWriter() {
+            if (charIndex < fullPoem.length) {
+                let currentChar = fullPoem.charAt(charIndex);
+                document.getElementById("poem-text").innerHTML += (currentChar === '\n') ? '<br>' : currentChar;
+                
+                charIndex++;
+                setTimeout(typeWriter, speed);
+                window.scrollTo(0, document.body.scrollHeight);
+            } else {
+                // Show BOTH buttons when poem is finished
+                document.getElementById('kissBtn').style.display = 'inline-block';
+                document.getElementById('audioBtn').style.display = 'inline-block';
+            }
+        }
+
+        function launchBalloons() {
+            const colors = ['#ff4b5c', '#80eeff', '#ffd700', '#ff69b4', '#7cfc00', '#ffffff'];
+            for (let i = 0; i < 21; i++) {
+                setTimeout(() => {
+                    const b = document.createElement('div');
+                    b.className = 'balloon';
+                    b.style.left = Math.random() * (window.innerWidth - 60) + 'px';
+                    b.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    document.body.appendChild(b);
+                    setTimeout(() => b.remove(), 7000);
+                }, i * 250);
+            }
+        }
+
+        function sendKisses() {
+            for(let i=0; i<15; i++) {
+                setTimeout(() => {
+                    const kiss = document.createElement('div');
+                    kiss.className = 'kiss-emoji';
+                    kiss.innerText = '💋';
+                    kiss.style.left = Math.random() * 80 + 10 + '%';
+                    kiss.style.top = '60%';
+                    document.body.appendChild(kiss);
+                    setTimeout(() => kiss.remove(), 2000);
+                }, i * 100);
+            }
+        }
+    </script>
+</body>
+</html>
